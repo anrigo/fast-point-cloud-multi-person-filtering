@@ -1,5 +1,5 @@
 # Fast Point Cloud Multi Person Filtering
-Fast point cloud multi person filteringnusing Open3d
+Fast point cloud multi person filtering using Open3d
 
 ## Useful links
 - [Main dataset website](http://domedb.perception.cs.cmu.edu/index.html)
