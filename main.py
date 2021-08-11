@@ -8,7 +8,7 @@ def test():
     data_path = 'dataset/'
     seq_name = '171204_pose1'
 
-    skel_points = None
+    np_skel_points = None
 
     hd_skel_json_path = data_path+seq_name+'/hdPose3d_stage1_coco19/'
     hd_face_json_path = data_path+seq_name+'/hdFace3d/'
@@ -51,10 +51,10 @@ def test():
                 for j in (0,1):
                     point = np.array([skel[0,edge][j], skel[1,edge][j], skel[2,edge][j]])
                     
-                    if skel_points is None:
-                        skel_points = point
-                    elif point not in skel_points:
-                        skel_points = np.vstack((skel_points, point))
+                    if np_skel_points is None:
+                        np_skel_points = point
+                    elif point not in np_skel_points:
+                        np_skel_points = np.vstack((np_skel_points, point))
 
                 
 
@@ -62,10 +62,12 @@ def test():
         print('Error reading {0}\n'.format(skel_json_fname)+e.strerror)
     
     plt.show()
-    print(skel_points.shape)
+    skel_points = o3d.utility.Vector3dVector(np_skel_points)
+    pt_cloud = o3d.geometry.PointCloud(skel_points)
+    o3d.visualization.draw_geometries([pt_cloud])
 
 
-def show_ptcloud(path):
+def show_ptcloud_from_file(path):
     pcd = o3d.io.read_point_cloud(path)
     o3d.visualization.draw_geometries([pcd])
 
