@@ -8,6 +8,8 @@ def test():
     data_path = 'dataset/'
     seq_name = '171204_pose1'
 
+    skel_points = None
+
     hd_skel_json_path = data_path+seq_name+'/hdPose3d_stage1_coco19/'
     hd_face_json_path = data_path+seq_name+'/hdFace3d/'
     hd_hand_json_path = data_path+seq_name+'/hdHand3d/'
@@ -45,13 +47,22 @@ def test():
 
             for edge in body_edges:
                 ax.plot(skel[0,edge], skel[1,edge], skel[2,edge], color=colors[body['id']])
-                ax.scatter(skel[0,edge], skel[1,edge], skel[2,edge], '.', color=[0,0,1])
-                # break
+
+                for j in (0,1):
+                    point = np.array([skel[0,edge][j], skel[1,edge][j], skel[2,edge][j]])
+                    
+                    if skel_points is None:
+                        skel_points = point
+                    elif point not in skel_points:
+                        skel_points = np.vstack((skel_points, point))
+
+                
 
     except IOError as e:
         print('Error reading {0}\n'.format(skel_json_fname)+e.strerror)
     
     plt.show()
+    print(skel_points.shape)
 
 
 def show_ptcloud(path):
