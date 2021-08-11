@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 plt.rcParams['image.interpolation'] = 'nearest'
 
 # Setup paths
-data_path = '../dataset/'
-seq_name = '171204_pose2'
+data_path = 'dataset/'
+seq_name = '171204_pose1'
 
 hd_skel_json_path = data_path+seq_name+'/hdPose3d_stage1_coco19/'
 hd_face_json_path = data_path+seq_name+'/hdFace3d/'
