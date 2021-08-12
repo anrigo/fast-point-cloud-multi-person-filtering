@@ -3,36 +3,33 @@ import open3d as o3d
 import json
 import matplotlib.pyplot as plt
 
-def test():
-    # Setup paths
-    data_path = 'dataset/'
-    seq_name = '171204_pose1'
+# Constants
+# Setup paths
+data_path = 'dataset/'
+# Edges between joints in the body skeleton
+body_edges = np.array([[1,2],[1,4],[4,5],[5,6],[1,3],[3,7],[7,8],[8,9],[3,13],[13,14],[14,15],[1,10],[10,11],[11,12]])-1
 
-    np_skel_points = None
+
+def load_skeleton_points_as_nparray(seq_name, hd_idx, plot=False):
+    skel_points = []
 
     hd_skel_json_path = data_path+seq_name+'/hdPose3d_stage1_coco19/'
-    hd_face_json_path = data_path+seq_name+'/hdFace3d/'
-    hd_hand_json_path = data_path+seq_name+'/hdHand3d/'
 
-    colors = plt.cm.hsv(np.linspace(0, 1, 10)).tolist()
+    if plot:
+        colors = plt.cm.hsv(np.linspace(0, 1, 10)).tolist()
 
-    from mpl_toolkits.mplot3d import Axes3D
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.view_init(elev = -90, azim=-90)
-    #ax.set_xlabel('X Label')
-    ax.set_ylabel('Y Label')
-    #ax.set_zlabel('Z Label')
-    ax.axis('auto')
-
-    # Select HD Image index
-    hd_idx = 400
+        from mpl_toolkits.mplot3d import Axes3D
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.view_init(elev = -90, azim=-90)
+        ax.set_xlabel('X Label')
+        ax.set_ylabel('Y Label')
+        ax.set_zlabel('Z Label')
+        ax.axis('auto')
 
     '''
     ## Visualize 3D Body
     '''
-    # Edges between joints in the body skeleton
-    body_edges = np.array([[1,2],[1,4],[4,5],[5,6],[1,3],[3,7],[7,8],[8,9],[3,13],[13,14],[14,15],[1,10],[10,11],[11,12]])-1
 
     try:
         # Load the json file with this frame's skeletons
@@ -43,28 +40,30 @@ def test():
         # Bodies
         for ids in range(len(bframe['bodies'])):
             body = bframe['bodies'][ids]
-            skel = np.array(body['joints19']).reshape((-1,4)).transpose()
 
-            for edge in body_edges:
-                ax.plot(skel[0,edge], skel[1,edge], skel[2,edge], color=colors[body['id']])
+            if plot:
+                skel = np.array(body['joints19']).reshape((-1,4)).transpose()
 
-                for j in (0,1):
-                    point = np.array([skel[0,edge][j], skel[1,edge][j], skel[2,edge][j]])
-                    
-                    if np_skel_points is None:
-                        np_skel_points = point
-                    elif point not in np_skel_points:
-                        np_skel_points = np.vstack((np_skel_points, point))
+                for edge in body_edges:
+                    ax.plot(skel[0,edge], skel[1,edge], skel[2,edge], color=colors[body['id']])
+
+            # skeleton format: x,y,z,c where c is the confidence
+            # keep 3d coordinates, remove confidence score
+            body_points = np.delete(np.array(body['joints19']).reshape((-1,4)), [-1], axis=1)
+
+            
+            skel_points.insert(ids, body_points)
 
                 
 
     except IOError as e:
         print('Error reading {0}\n'.format(skel_json_fname)+e.strerror)
     
-    plt.show()
-    skel_points = o3d.utility.Vector3dVector(np_skel_points)
-    pt_cloud = o3d.geometry.PointCloud(skel_points)
-    o3d.visualization.draw_geometries([pt_cloud])
+
+    if plot:
+        plt.show()
+    
+    return skel_points
 
 
 def show_ptcloud_from_file(path):
@@ -72,5 +71,11 @@ def show_ptcloud_from_file(path):
     o3d.visualization.draw_geometries([pcd])
 
 if __name__ == "__main__":
-    # show_ptcloud("kinoptic_ptclouds/171204_pose1/ptcloud_hd00000010.ply")
-    test()
+    # show_ptcloud_from_file("kinoptic_ptclouds/171204_pose1/ptcloud_hd00000020.ply")
+    skels = load_skeleton_points_as_nparray('171204_pose1', 400)
+
+    # print(skels[0])
+
+    skel_points = o3d.utility.Vector3dVector(skels[0])
+    pt_cloud = o3d.geometry.PointCloud(skel_points)
+    o3d.visualization.draw_geometries([pt_cloud])
