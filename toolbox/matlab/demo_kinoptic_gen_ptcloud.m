@@ -22,9 +22,9 @@
 % (root_path)/(seqName)/calibration_(seqName).json
 % (root_path)/(seqName)/synctables_(seqName).json
 
-root_path = '[]' %Put your root path where sequence folders are locates
-seqName = '[]'  %Put your target sequence name here
-hd_index_list= 500:500; % Target frames you want to export ply files
+root_path = 'C://Users//Admin//Desktop//fast-point-cloud-multi-person-filtering//dataset'; %Put your root path where sequence folders are locates
+seqName = '171204_pose1';  %Put your target sequence name here
+hd_index_list= 118:200; % Target frames you want to export ply files
 
 %The followings are an example
 % root_path = '/posefs0c/panoptic' %An example
@@ -96,7 +96,7 @@ for hd_index = hd_index_list
     all_colorsv = [];   %colors for point cloud 
 
 
-    for idk = 1:10  %Iterating 10 kinects. Change this if you want a subpart
+    for idk = 1:1  %Iterating 10 kinects. Change this if you want a subpart
 
         if idk==1 && bVisOutput   %Visualize the results from the frist kinect only. 
             vis_output = 1;
