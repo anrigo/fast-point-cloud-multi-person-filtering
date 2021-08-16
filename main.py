@@ -10,26 +10,10 @@ data_path = 'dataset/'
 body_edges = np.array([[1,2],[1,4],[4,5],[5,6],[1,3],[3,7],[7,8],[8,9],[3,13],[13,14],[14,15],[1,10],[10,11],[11,12]])-1
 
 
-def load_skeleton_points_as_nparray(seq_name, hd_idx, plot=False):
+def load_skeleton_points_as_nparray(seq_name, hd_idx):
     skel_points = []
 
     hd_skel_json_path = data_path+seq_name+'/hdPose3d_stage1_coco19/'
-
-    if plot:
-        colors = plt.cm.hsv(np.linspace(0, 1, 10)).tolist()
-
-        from mpl_toolkits.mplot3d import Axes3D
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-        ax.view_init(elev = -90, azim=-90)
-        ax.set_xlabel('X Label')
-        ax.set_ylabel('Y Label')
-        ax.set_zlabel('Z Label')
-        ax.axis('auto')
-
-    '''
-    ## Visualize 3D Body
-    '''
 
     try:
         # Load the json file with this frame's skeletons
@@ -41,12 +25,6 @@ def load_skeleton_points_as_nparray(seq_name, hd_idx, plot=False):
         for ids in range(len(bframe['bodies'])):
             body = bframe['bodies'][ids]
 
-            if plot:
-                skel = np.array(body['joints19']).reshape((-1,4)).transpose()
-
-                for edge in body_edges:
-                    ax.plot(skel[0,edge], skel[1,edge], skel[2,edge], color=colors[body['id']])
-
             # skeleton format: x,y,z,c where c is the confidence
             # keep 3d coordinates, remove confidence score
             body_points = np.delete(np.array(body['joints19']).reshape((-1,4)), [-1], axis=1)
@@ -54,14 +32,9 @@ def load_skeleton_points_as_nparray(seq_name, hd_idx, plot=False):
             
             skel_points.insert(ids, body_points)
 
-                
-
     except IOError as e:
         print('Error reading {0}\n'.format(skel_json_fname)+e.strerror)
     
-
-    if plot:
-        plt.show()
     
     return skel_points
 
@@ -71,8 +44,8 @@ def show_ptcloud_from_file(path):
     o3d.visualization.draw_geometries([pcd])
 
 if __name__ == "__main__":
-    # show_ptcloud_from_file("kinoptic_ptclouds/171204_pose1/ptcloud_hd00000020.ply")
-    skels = load_skeleton_points_as_nparray('171204_pose1', 400)
+    show_ptcloud_from_file("kinoptic_ptclouds/171204_pose1/ptcloud_hd00000175.ply")
+    skels = load_skeleton_points_as_nparray('171204_pose1', 175)
 
     # print(skels[0])
 
