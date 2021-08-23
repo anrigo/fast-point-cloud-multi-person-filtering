@@ -33,13 +33,14 @@ def filter(pcd, skels, edges):
 
     n = x1-x2
 
-    # print(x1,x2)
+    r = 5
 
     indexes = []
 
     for i, point in enumerate(pcd.points):
         if plane(point, x1, n) <= 0:
             if plane(point, x2, -n) <=0:
-                indexes.append(i)
+                if cylinder(point, x1, x2, r) <= 0:
+                    indexes.append(i)
 
     return pcd.select_by_index(indexes)
