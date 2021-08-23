@@ -19,12 +19,27 @@ def cylinder(x, x1, x2, radius):
     return (num/den) - radius
 
 
-def filter(pcd, skel, edges):
+def filter(pcd, skels, edges):
     # TODO
     # for each point in the pointcloud, check if it
     # belongs to the truncated cylinder defined between
     # the two points of each each edge
     
-    print('test')
+    # lElbow, lWrist
+    edge = [4,5]
 
-    return None
+    x1 = skels[0][edge[0]]
+    x2 = skels[0][edge[1]]
+
+    n = x1-x2
+
+    # print(x1,x2)
+
+    indexes = []
+
+    for i, point in enumerate(pcd.points):
+        if plane(point, x1, n) <= 0:
+            if plane(point, x2, -n) <=0:
+                indexes.append(i)
+
+    return pcd.select_by_index(indexes)

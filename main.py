@@ -1,7 +1,7 @@
 import numpy as np
 import open3d as o3d
 import json
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import geometric_filtering as gf
 
 # Constants
@@ -47,12 +47,13 @@ def load_ptcloud(path, draw=False):
     return pcd
 
 if __name__ == "__main__":
-    pcd = load_ptcloud("kinoptic_ptclouds/171204_pose1/ptcloud_hd00000175.ply", draw=True)
+    pcd = load_ptcloud("kinoptic_ptclouds/171204_pose1/ptcloud_hd00000175.ply")
 
     skels = load_skeleton_points_as_nparray('171204_pose1', 175)
 
-    skel_points = o3d.utility.Vector3dVector(skels[0])
-    pt_cloud = o3d.geometry.PointCloud(skel_points)
-    o3d.visualization.draw_geometries([pt_cloud])
+    # skel_points = o3d.utility.Vector3dVector(skels[0])
+    # pt_cloud = o3d.geometry.PointCloud(skel_points)
+    # o3d.visualization.draw_geometries([pt_cloud])
 
-    gf.filter(pcd, skels[0], body_edges)
+    filtered = gf.filter(pcd, skels, body_edges)
+    o3d.visualization.draw_geometries([filtered])
