@@ -9,3 +9,5 @@ Fast point cloud multi person filtering using Open3d
 - [List of released sequences (ver1.2)](https://docs.google.com/spreadsheets/d/1eoe74dHRtoMVVFLKCTJkAtF8zqxAnoo2Nt15CYYvHEE/edit#gid=1333444170)
 - [3D PointCloud list ver.1](https://docs.google.com/spreadsheets/d/1MsD9ioWBToHWz0E33gzFS5nDDjVHRECE2bZ1vM1ff_I/edit?usp=sharing)
 - [Open3d documetation](http://www.open3d.org/docs/release/)
+- [Plane equation](https://home.aero.polimi.it/lastaria/archivio/2017_slides_geometria_2.pdf)
+- [3D point-line distance, cylinder](https://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html)
