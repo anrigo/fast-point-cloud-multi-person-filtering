@@ -83,7 +83,7 @@ def filter(pcd, skels, edges):
             # rHip, rKnee: 12,13
             or is_in_truncated_cylinder(point, skel[12], skel[13], 10)
 
-            # rKnee, kAnkle: 13,14
+            # rKnee, rAnkle: 13,14
             or is_in_truncated_cylinder(point, skel[13], skel[14], 10)
         ):
             indexes.append(i)
