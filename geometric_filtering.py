@@ -19,6 +19,17 @@ def cylinder(x, x1, x2, radius):
     return (num/den) - radius
 
 
+def is_in_truncated_cylinder(point, x1, x2, r):
+    n = x1-x2
+
+    if (plane(point, x1, n) <= 0
+        and plane(point, x2, n) >=0
+        and cylinder(point, x1, x2, r) <= 0):
+        return True
+    
+    return False
+
+
 def filter(pcd, skels, edges):
     # TODO
     # for each point in the pointcloud, check if it
@@ -38,9 +49,7 @@ def filter(pcd, skels, edges):
     indexes = []
 
     for i, point in enumerate(pcd.points):
-        if plane(point, x1, n) <= 0:
-            if plane(point, x2, -n) <=0:
-                if cylinder(point, x1, x2, r) <= 0:
-                    indexes.append(i)
+        if is_in_truncated_cylinder(point, x1, x2, r):
+            indexes.append(i)
 
     return pcd.select_by_index(indexes)
