@@ -51,9 +51,12 @@ if __name__ == "__main__":
 
     skels = load_skeleton_points_as_nparray('171204_pose1', 175)
 
+    # head = np.array([[-126.85966667, -163.11133333, -11.09929333]])
+
     # skel_points = o3d.utility.Vector3dVector(skels[0])
+    # skel_points = o3d.utility.Vector3dVector(head)
     # pt_cloud = o3d.geometry.PointCloud(skel_points)
-    # o3d.visualization.draw_geometries([pt_cloud])
+    # o3d.visualization.draw_geometries([pcd, pt_cloud])
 
     filtered = gf.filter(pcd, skels, body_edges)
     o3d.visualization.draw_geometries([filtered])

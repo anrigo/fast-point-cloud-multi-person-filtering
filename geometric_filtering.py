@@ -30,6 +30,10 @@ def is_in_truncated_cylinder(point, x1, x2, r):
     return False
 
 
+def sphere(x, c, radius):
+    return np.linalg.norm(x-c) - radius
+
+
 def filter(pcd, skels, edges):
 
     # 0: Neck
@@ -55,13 +59,14 @@ def filter(pcd, skels, edges):
     skel = skels[0]
     indexes = []
 
+    head_center = np.mean(skel[[1,16,18]], axis=0)
 
     for i, point in enumerate(pcd.points):
         if (
             # ARMS
 
             # lShoulder, lElbow: 3,4
-            is_in_truncated_cylinder(point, skel[3], skel[4], 10)
+            is_in_truncated_cylinder(point, skel[3], skel[4], 5)
 
             # lElbow, lWrist: 4,5
             or is_in_truncated_cylinder(point, skel[4], skel[5], 5)
@@ -85,6 +90,20 @@ def filter(pcd, skels, edges):
 
             # rKnee, rAnkle: 13,14
             or is_in_truncated_cylinder(point, skel[13], skel[14], 10)
+
+            # neck, bodyCenter: 0,2
+            or is_in_truncated_cylinder(point, skel[0], skel[2], 18)
+
+            # HEAD
+            or sphere(point, head_center, 18) <= 0
+
+            # SHOULDERS
+
+            # lShoulder, Neck: 3,0
+            or is_in_truncated_cylinder(point, skel[3], skel[0], 15)
+
+            # rShoulder, Neck: 9,0
+            or is_in_truncated_cylinder(point, skel[9], skel[0], 15)
         ):
             indexes.append(i)
 
