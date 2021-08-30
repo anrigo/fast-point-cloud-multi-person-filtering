@@ -47,9 +47,9 @@ def load_ptcloud(path, draw=False):
     return pcd
 
 if __name__ == "__main__":
-    pcd = load_ptcloud("kinoptic_ptclouds/171204_pose1/ptcloud_hd00000198.ply")
+    pcd = load_ptcloud("kinoptic_ptclouds/171204_pose1/ptcloud_hd00000175.ply")
 
-    skels = load_skeleton_points_as_nparray('171204_pose1', 198)
+    skels = load_skeleton_points_as_nparray('171204_pose1', 175)
 
     head = np.array([[-126.85966667, -163.11133333, -11.09929333]])
 
@@ -59,5 +59,5 @@ if __name__ == "__main__":
     head_cloud = o3d.geometry.PointCloud(head_points)
     # o3d.visualization.draw_geometries([pcd, skel_cloud, head_cloud])
 
-    filtered = gf.filter(pcd, skels, body_edges)
+    filtered = gf.filter(pcd, skels)
     o3d.visualization.draw_geometries([filtered, skel_cloud])

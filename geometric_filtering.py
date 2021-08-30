@@ -34,7 +34,7 @@ def sphere(x, c, radius):
     return np.linalg.norm(x-c) - radius
 
 
-def filter(pcd, skels, edges):
+def filter(pcd, skels):
 
     # 0: Neck
     # 1: Nose
