@@ -52,7 +52,7 @@ def load_skeleton_points_as_nparray(seq_name, hd_idx):
         print('Error reading {0}\n'.format(skel_json_fname)+e.strerror)
     
     
-    skels = [[skel_points[i], hands[i]] for i in range(len(skel_points))]
+    skels = [[skel_points[i], hands[i][0], hands[i][1]] for i in range(len(skel_points))]
 
 
     return skels
@@ -76,8 +76,8 @@ if __name__ == "__main__":
     head_points = o3d.utility.Vector3dVector(head)
     skel_cloud = o3d.geometry.PointCloud(skel_points)
     head_cloud = o3d.geometry.PointCloud(head_points)
-    l_hand_points = o3d.utility.Vector3dVector(skels[0][1][0])
-    r_hand_points = o3d.utility.Vector3dVector(skels[0][1][1])
+    l_hand_points = o3d.utility.Vector3dVector(skels[0][1])
+    r_hand_points = o3d.utility.Vector3dVector(skels[0][2])
     r_hand_cloud = o3d.geometry.PointCloud(r_hand_points)
     l_hand_cloud = o3d.geometry.PointCloud(l_hand_points)
     o3d.visualization.draw_geometries([pcd, skel_cloud, head_cloud, l_hand_cloud, r_hand_cloud])
