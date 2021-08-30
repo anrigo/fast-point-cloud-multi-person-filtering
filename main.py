@@ -1,28 +1,35 @@
 import numpy as np
 import open3d as o3d
 import json
-# import matplotlib.pyplot as plt
 import geometric_filtering as gf
+
 
 # Constants
 # Setup paths
 data_path = 'dataset/'
-# Edges between joints in the body skeleton
-body_edges = np.array([[1,2],[1,4],[4,5],[5,6],[1,3],[3,7],[7,8],[8,9],[3,13],[13,14],[14,15],[1,10],[10,11],[11,12]])-1
 
 
 def load_skeleton_points_as_nparray(seq_name, hd_idx):
     skel_points = []
+    hands = []
 
     hd_skel_json_path = data_path+seq_name+'/hdPose3d_stage1_coco19/'
+    hd_hand_json_path = data_path+seq_name+'/hdHand3d/'
 
     try:
         # Load the json file with this frame's skeletons
         skel_json_fname = hd_skel_json_path+'body3DScene_{0:08d}.json'.format(hd_idx)
         with open(skel_json_fname) as dfile:
             bframe = json.load(dfile)
+        
 
-        # Bodies
+        # Load hand json
+        hand_json_fname = hd_hand_json_path+'handRecon3D_hd{0:08d}.json'.format(hd_idx)
+        with open(hand_json_fname) as dfile:
+            hframe = json.load(dfile)
+
+
+        # Cycle Bodies
         for ids in range(len(bframe['bodies'])):
             body = bframe['bodies'][ids]
 
@@ -32,12 +39,23 @@ def load_skeleton_points_as_nparray(seq_name, hd_idx):
 
             
             skel_points.insert(ids, body_points)
+        
+
+        # Cycle Hands
+        for hand in hframe['people']:
+            hand3d_r = np.array(hand['right_hand']['landmarks']).reshape((-1,3))
+            hand3d_l = np.array(hand['left_hand']['landmarks']).reshape((-1,3))
+
+            hands.append([hand3d_l, hand3d_r])
 
     except IOError as e:
         print('Error reading {0}\n'.format(skel_json_fname)+e.strerror)
     
     
-    return skel_points
+    skels = [[skel_points[i], hands[i]] for i in range(len(skel_points))]
+
+
+    return skels
 
 
 def load_ptcloud(path, draw=False):
@@ -46,6 +64,7 @@ def load_ptcloud(path, draw=False):
         o3d.visualization.draw_geometries([pcd])
     return pcd
 
+
 if __name__ == "__main__":
     pcd = load_ptcloud("kinoptic_ptclouds/171204_pose1/ptcloud_hd00000175.ply")
 
@@ -53,11 +72,15 @@ if __name__ == "__main__":
 
     head = np.array([[-126.85966667, -163.11133333, -11.09929333]])
 
-    skel_points = o3d.utility.Vector3dVector(skels[0])
+    skel_points = o3d.utility.Vector3dVector(skels[0][0])
     head_points = o3d.utility.Vector3dVector(head)
     skel_cloud = o3d.geometry.PointCloud(skel_points)
     head_cloud = o3d.geometry.PointCloud(head_points)
-    # o3d.visualization.draw_geometries([pcd, skel_cloud, head_cloud])
+    l_hand_points = o3d.utility.Vector3dVector(skels[0][1][0])
+    r_hand_points = o3d.utility.Vector3dVector(skels[0][1][1])
+    r_hand_cloud = o3d.geometry.PointCloud(r_hand_points)
+    l_hand_cloud = o3d.geometry.PointCloud(l_hand_points)
+    o3d.visualization.draw_geometries([pcd, skel_cloud, head_cloud, l_hand_cloud, r_hand_cloud])
 
-    filtered = gf.filter(pcd, skels)
-    o3d.visualization.draw_geometries([filtered, skel_cloud])
+    # filtered = gf.filter(pcd, skels)
+    # o3d.visualization.draw_geometries([filtered, skel_cloud])
