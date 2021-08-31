@@ -2,6 +2,7 @@ import numpy as np
 import open3d as o3d
 import json
 import geometric_filtering as gf
+import time as tm
 
 
 # Constants
@@ -66,7 +67,7 @@ def load_ptcloud(path, draw=False):
 
 
 if __name__ == "__main__":
-    pcd = load_ptcloud("kinoptic_ptclouds/171204_pose1/ptcloud_hd00000175.ply")
+    pcd = load_ptcloud("kinoptic_ptclouds/171204_pose1/ptcloud_hd00000175.ply", draw=True)
 
     skels = load_skeleton_points_as_nparray('171204_pose1', 175)
 
@@ -82,5 +83,10 @@ if __name__ == "__main__":
     # l_hand_cloud = o3d.geometry.PointCloud(l_hand_points)
     # o3d.visualization.draw_geometries([pcd, skel_cloud, head_cloud, l_hand_cloud, r_hand_cloud])
 
+    t0 = tm.time()
     filtered = gf.filter(pcd, skels)
+    t1 = tm.time()
+
+    print(t1-t0)
+
     o3d.visualization.draw_geometries([filtered])
