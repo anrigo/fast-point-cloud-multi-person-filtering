@@ -2,15 +2,23 @@ import open3d as o3d
 import numpy as np
 
 
-box = o3d.geometry.TriangleMesh.create_box(width=1.0, height=2.0, depth=4.0)
-box2 = o3d.geometry.TriangleMesh.create_box(width=1.0, height=2.0, depth=4.0)
+def aaa(pt):
+    print("({},{},{})".format(pt[0], pt[1], pt[2]))
 
-R = o3d.geometry.get_rotation_matrix_from_axis_angle(rotation=np.array([0.3, 0.3, 0.3]))
 
-box.rotate(R)
-box2.rotate(R)
+A = np.array([2,2,0])
+l = np.linalg.norm(A)
 
-box2.vertices = o3d.utility.Vector3dVector(np.asarray(box2.vertices) * np.array([1., 2., 4.]))
-box2.translate(translation=np.array([3,3,3]))
 
-o3d.visualization.draw_geometries([box, box2])
+# theta_x = np.pi/4
+theta_x = np.arccos(A[0]/l)
+theta_y = np.arccos(A[1]/l)
+theta_z = np.arccos(A[2]/l)
+print(theta_x)
+
+R = o3d.geometry.get_rotation_matrix_from_axis_angle([0,0,-theta_x])
+print(R)
+# R_inv = np.linalg.inv(R)
+
+V = np.dot(R, np.array([2,2,0]))
+aaa(V)
