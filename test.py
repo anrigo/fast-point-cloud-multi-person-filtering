@@ -6,46 +6,42 @@ def aaa(pt):
     print("({},{},{})".format(pt[0], pt[1], pt[2]))
 
 
-# A = np.array([2,2,0])
-# l = np.linalg.norm(A)
+# EULER-RODRIGUES FORMULA
+def rotation_matrix(axis, theta):
+    """
+    Return the rotation matrix associated with counterclockwise rotation about
+    the given axis by theta radians.
+    """
+    axis = np.asarray(axis)
+    axis = axis / np.sqrt(np.dot(axis, axis))
+    a = np.cos(theta / 2.0)
+    b, c, d = -axis * np.sin(theta / 2.0)
+    aa, bb, cc, dd = a * a, b * b, c * c, d * d
+    bc, ad, ac, ab, bd, cd = b * c, a * d, a * c, a * b, b * d, c * d
+    return np.array([[aa + bb - cc - dd, 2 * (bc + ad), 2 * (bd - ac)],
+                     [2 * (bc - ad), aa + cc - bb - dd, 2 * (cd + ab)],
+                     [2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc]])
 
 
-# # theta_x = np.pi/4
-# theta_x = np.arccos(A[0]/l)
-# theta_y = np.arccos(A[1]/l)
-# theta_z = np.arccos(A[2]/l)
-# print(theta_x)
+A = np.array([2.1,4.5,3])
+B = np.array([4.5,1.7,3.1])
 
-# R = o3d.geometry.get_rotation_matrix_from_axis_angle([0,0,-theta_x])
-# print(R)
-# # R_inv = np.linalg.inv(R)
-
-# V = np.dot(R, np.array([2,2,0]))
-# aaa(V)
-
-A = np.array([1.3,1.1,1.5])
-B = np.array([2.6,2.4,2.9])
-
-ref = np.array([np.deg2rad(90), np.deg2rad(90), 0])
 
 v = B-A
 l = np.linalg.norm(v)
-
 c = (A+B)/2
 
-rot = np.arccos(v/l)
-print(np.rad2deg(rot))
-
-delta = rot-ref
+ref = np.array([0,0,1])
 
 zero = 0.00000000000001
 
 
-# R = o3d.geometry.get_rotation_matrix_from_axis_angle([zero, zero, zero])
-# R = o3d.geometry.get_rotation_matrix_from_axis_angle(rot)
-R = o3d.geometry.get_rotation_matrix_from_axis_angle(np.array([delta[1],delta[2],0])+np.array([zero, zero, zero]))
+theta = np.arccos(np.dot(v,ref)/l)
+axis = np.cross(v, ref)
 
-# R_inv = np.linalg.inv(R)
+
+R = rotation_matrix(axis, -theta)
+# R = o3d.geometry.get_rotation_matrix_from_axis_angle([zero, zero, zero])
 
 box = o3d.geometry.OrientedBoundingBox(
     center=c,
