@@ -1,5 +1,6 @@
 import open3d as o3d
 import numpy as np
+import time as tm
 
 
 def aaa(pt):
@@ -26,6 +27,7 @@ def rotation_matrix(axis, theta):
 A = np.array([2.1,4.5,3])
 B = np.array([4.5,1.7,3.1])
 
+t0 = tm.time()
 
 v = B-A
 l = np.linalg.norm(v)
@@ -33,7 +35,7 @@ c = (A+B)/2
 
 ref = np.array([0,0,1])
 
-zero = 0.00000000000001
+# zero = 0.00000000000001
 
 
 theta = np.arccos(np.dot(v,ref)/l)
@@ -42,6 +44,10 @@ axis = np.cross(v, ref)
 
 R = rotation_matrix(axis, -theta)
 # R = o3d.geometry.get_rotation_matrix_from_axis_angle([zero, zero, zero])
+
+
+t1 = tm.time()
+print(t1-t0)
 
 box = o3d.geometry.OrientedBoundingBox(
     center=c,
