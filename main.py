@@ -1,7 +1,7 @@
 import numpy as np
 import open3d as o3d
 import json
-import geometric_filtering2 as gf
+import bbox_filtering as bf
 import time as tm
 
 
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     # o3d.visualization.draw_geometries([pcd, skel_cloud, head_cloud, l_hand_cloud, r_hand_cloud])
 
     t0 = tm.time()
-    filtered = gf.filter(pcd, skels)
+    filtered = bf.filter(pcd, skels)
     t1 = tm.time()
 
     print(t1-t0)

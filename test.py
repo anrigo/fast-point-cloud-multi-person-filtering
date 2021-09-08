@@ -23,17 +23,20 @@ def rotation_matrix(axis, theta):
                      [2 * (bc - ad), aa + cc - bb - dd, 2 * (cd + ab)],
                      [2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc]])
 
-# [-106.543  -146.843   -23.1307] [ -98.6006 -119.297   -26.6354]
-A = np.array([-106.543,-146.843,-23.1307])
-B = np.array([-98.6006,-119.297,-26.6354])
+
+# A = np.array([0,1,0])
+# B = np.array([0,3,0])
+
+ref = np.array([0,0,1])
+
+A = ref*1.5
+B = ref*3
 
 t0 = tm.time()
 
 v = B-A
 l = np.linalg.norm(v)
 c = (A+B)/2
-
-ref = np.array([0,0,1])
 
 # zero = 0.00000000000001
 
@@ -42,19 +45,23 @@ theta = np.arccos(np.dot(v,ref)/l)
 axis = np.cross(v, ref)
 
 
-R = rotation_matrix(axis, -theta)
-# R = o3d.geometry.get_rotation_matrix_from_axis_angle([zero, zero, zero])
+print('Theta: ' + str(np.rad2deg(theta)))
 
+
+if np.linalg.norm(axis) != 0:
+    R = rotation_matrix(axis, -theta)
+else:
+    R = np.eye(3)
+
+
+box = o3d.geometry.OrientedBoundingBox(
+        center=c,
+        R=R,
+        extent=np.array([1,1,l])
+        )
 
 t1 = tm.time()
 print(t1-t0)
-
-box = o3d.geometry.OrientedBoundingBox(
-    center=c,
-    R=R,
-    extent=np.array([1,1,l])
-    )
-
 
 v3d = o3d.utility.Vector3dVector([A,B])
 pcd = o3d.geometry.PointCloud(v3d)
