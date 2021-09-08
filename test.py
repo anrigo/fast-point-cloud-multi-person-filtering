@@ -23,9 +23,9 @@ def rotation_matrix(axis, theta):
                      [2 * (bc - ad), aa + cc - bb - dd, 2 * (cd + ab)],
                      [2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc]])
 
-
-A = np.array([2.1,4.5,3])
-B = np.array([4.5,1.7,3.1])
+# [-106.543  -146.843   -23.1307] [ -98.6006 -119.297   -26.6354]
+A = np.array([-106.543,-146.843,-23.1307])
+B = np.array([-98.6006,-119.297,-26.6354])
 
 t0 = tm.time()
 

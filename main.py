@@ -1,7 +1,7 @@
 import numpy as np
 import open3d as o3d
 import json
-import geometric_filtering as gf
+import geometric_filtering2 as gf
 import time as tm
 
 

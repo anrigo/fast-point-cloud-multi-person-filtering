@@ -58,7 +58,7 @@ def filter(pcd, skels):
 
     skel = skels[0]
     body = skel[0]
-    indexes = []
+    indices = []
 
     head_center = np.mean(body[[1,16,18]], axis=0)
     l_hand_center = np.mean(skel[1], axis=0)
@@ -117,6 +117,6 @@ def filter(pcd, skels):
             # lHand
             or sphere(point, l_hand_center, 15) <= 0
         ):
-            indexes.append(i)
+            indices.append(i)
 
-    return pcd.select_by_index(indexes)
+    return pcd.select_by_index(indices)
