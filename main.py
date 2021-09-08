@@ -73,9 +73,9 @@ if __name__ == "__main__":
 
     # head = np.array([[-126.85966667, -163.11133333, -11.09929333]])
 
-    # skel_points = o3d.utility.Vector3dVector(skels[0][0])
+    skel_points = o3d.utility.Vector3dVector(skels[0][0])
     # head_points = o3d.utility.Vector3dVector(head)
-    # skel_cloud = o3d.geometry.PointCloud(skel_points)
+    skel_cloud = o3d.geometry.PointCloud(skel_points)
     # head_cloud = o3d.geometry.PointCloud(head_points)
     # l_hand_points = o3d.utility.Vector3dVector(skels[0][1])
     # r_hand_points = o3d.utility.Vector3dVector(skels[0][2])
@@ -89,4 +89,4 @@ if __name__ == "__main__":
 
     print(t1-t0)
 
-    o3d.visualization.draw_geometries([filtered])
+    o3d.visualization.draw_geometries([filtered, skel_cloud])

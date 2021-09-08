@@ -41,7 +41,7 @@ def get_indices_of_points_in_prism_bbox(x1, x2, points):
     box = o3d.geometry.OrientedBoundingBox(
             center=c,
             R=R,
-            extent=np.array([20,20,l])
+            extent=np.array([25,25,l])
             )
     
     idx = box.get_point_indices_within_bounding_box(points)
@@ -53,7 +53,7 @@ def get_indices_of_points_in_cubic_bbox(x, points):
     box = o3d.geometry.OrientedBoundingBox(
             center=x,
             R=np.eye(3),
-            extent=np.array([15,15,15])
+            extent=np.array([18,18,18])
             )
     
     idx = box.get_point_indices_within_bounding_box(points)
@@ -100,11 +100,13 @@ def filter(pcd, skels):
         [0,2], # neck-body-center
         [9,0], # r-shoulder-neck
         [3,0], # l-shoulder-neck
+
+        # BACKSIDE
+        [6, 12], # l-hip-r-hip
     ]
 
     skel = skels[0]
     body = skel[0]
-    indexes = []
 
     centers = [
         np.mean(body[[1,16,18]], axis=0), # head
