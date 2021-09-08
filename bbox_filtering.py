@@ -41,7 +41,7 @@ def get_indices_of_points_in_prism_bbox(x1, x2, points):
     box = o3d.geometry.OrientedBoundingBox(
             center=c,
             R=R,
-            extent=np.array([25,25,l])
+            extent=np.array([36,36,l])
             )
     
     idx = box.get_point_indices_within_bounding_box(points)
