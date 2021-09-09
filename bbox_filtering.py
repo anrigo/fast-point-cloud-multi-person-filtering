@@ -105,15 +105,6 @@ def filter(pcd, skels):
         [6, 12], # l-hip-r-hip
     ]
 
-    skel = skels[0]
-    body = skel[0]
-
-    centers = [
-        np.mean(body[[1,16,18]], axis=0), # head
-        np.mean(skel[1], axis=0), # l-hand
-        np.mean(skel[2], axis=0), # r-hand
-        ]
-
     joints = [
         3, # l-shoulder
         9, # r-shoulder
@@ -127,19 +118,30 @@ def filter(pcd, skels):
 
     indices = []
 
-    for edge in edges:
-        indices.extend(
-            get_indices_of_points_in_prism_bbox(body[edge[0]], body[edge[1]], pcd.points)
-        )
-    
-    for center in centers:
-        indices.extend(
-            get_indices_of_points_in_cubic_bbox(center, pcd.points)
-        )
-    
-    for joint in joints:
-        indices.extend(
-            get_indices_of_points_in_cubic_bbox(body[joint], pcd.points)
-        )
+    for skel in skels:
+        
+        body = skel[0]
+
+        centers = [
+            np.mean(body[[1,16,18]], axis=0), # head
+            np.mean(skel[1], axis=0), # l-hand
+            np.mean(skel[2], axis=0), # r-hand
+            ]
+
+
+        for edge in edges:
+            indices.extend(
+                get_indices_of_points_in_prism_bbox(body[edge[0]], body[edge[1]], pcd.points)
+            )
+        
+        for center in centers:
+            indices.extend(
+                get_indices_of_points_in_cubic_bbox(center, pcd.points)
+            )
+        
+        for joint in joints:
+            indices.extend(
+                get_indices_of_points_in_cubic_bbox(body[joint], pcd.points)
+            )
 
     return pcd.select_by_index(indices)
