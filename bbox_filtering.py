@@ -20,7 +20,7 @@ def rotation_matrix(axis, theta):
                      [2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc]])
 
 
-def get_indices_of_points_in_prism_bbox(x1, x2, points):
+def get_indices_of_points_in_prism_bbox(x1, x2, ratio, points):
     
     ref = np.array([0,0,1])
 
@@ -41,7 +41,7 @@ def get_indices_of_points_in_prism_bbox(x1, x2, points):
     box = o3d.geometry.OrientedBoundingBox(
             center=c,
             R=R,
-            extent=np.array([36,36,l])
+            extent=np.array([ratio*l,ratio*l,l])
             )
     
     idx = box.get_point_indices_within_bounding_box(points)
@@ -49,11 +49,11 @@ def get_indices_of_points_in_prism_bbox(x1, x2, points):
     return idx
 
 
-def get_indices_of_points_in_cubic_bbox(x, points):
+def get_indices_of_points_in_cubic_bbox(x, extent, points):
     box = o3d.geometry.OrientedBoundingBox(
             center=x,
             R=np.eye(3),
-            extent=np.array([18,18,18])
+            extent=np.array([extent, extent, extent])
             )
     
     idx = box.get_point_indices_within_bounding_box(points)
@@ -116,10 +116,47 @@ def filter(pcd, skels):
         13, # r-knee
     ]
 
+    ratios = [
+        # ARMS
+        0.5, # l-shoulder-elbow
+        0.4, # l-elbow-wrist
+        0.5, # r-shoulder-elbow
+        0.4, # r-elbow-wrist
+
+        # LEGS
+        0.6, # l-hip-knee
+        0.6, # l-knee-ankle
+        0.6, # r-hip-ankle
+        0.6, # r-knee-ankle
+        
+        # UPPER BODY
+        0.6, # neck-body-center
+        0.9, # r-shoulder-neck
+        0.9, # l-shoulder-neck
+
+        # BACKSIDE
+        0.4, # l-hip-r-hip
+    ]
+
+    sizes = [
+        27, # head
+        18, # l-hand
+        18, # r-hand
+
+        18, # l-shoulder
+        18, # r-shoulder
+        18, # l-elbow
+        18, # r-elbow
+        18, # l-wrist
+        18, # r-wrist
+        18, # l-knee
+        18, # r-knee
+    ]
+
     indices = []
 
     for skel in skels:
-        
+
         body = skel[0]
 
         centers = [
@@ -129,19 +166,19 @@ def filter(pcd, skels):
             ]
 
 
-        for edge in edges:
+        for i, edge in enumerate(edges):
             indices.extend(
-                get_indices_of_points_in_prism_bbox(body[edge[0]], body[edge[1]], pcd.points)
+                get_indices_of_points_in_prism_bbox(body[edge[0]], body[edge[1]], ratios[i], pcd.points)
             )
         
-        for center in centers:
+        for i, center in enumerate(centers):
             indices.extend(
-                get_indices_of_points_in_cubic_bbox(center, pcd.points)
+                get_indices_of_points_in_cubic_bbox(center, sizes[i], pcd.points)
             )
         
-        for joint in joints:
+        for i, joint in enumerate(joints):
             indices.extend(
-                get_indices_of_points_in_cubic_bbox(body[joint], pcd.points)
+                get_indices_of_points_in_cubic_bbox(body[joint], sizes[i+3], pcd.points)
             )
 
     return pcd.select_by_index(indices)

@@ -67,7 +67,7 @@ def load_ptcloud(path, draw=False):
 
 
 if __name__ == "__main__":
-    pcd = load_ptcloud("kinoptic_ptclouds/171204_pose1/ptcloud_hd00000135.ply", draw=True)
+    pcd = load_ptcloud("kinoptic_ptclouds/171204_pose1/ptcloud_hd00000135.ply")
 
     skels = load_skeleton_points_as_nparray('171204_pose1', 135)
 
