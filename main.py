@@ -1,3 +1,4 @@
+from typing import Sequence
 import numpy as np
 import open3d as o3d
 import json
@@ -59,17 +60,25 @@ def load_skeleton_points_as_nparray(seq_name, hd_idx):
     return skels
 
 
-def load_ptcloud(path, draw=False):
+def load_ptcloud(sequence, hd_idx, draw=False):
+
+    path = f"kinoptic_ptclouds/{sequence}" + "/ptcloud_hd{0:08d}.ply".format(hd_idx)
+
     pcd = o3d.io.read_point_cloud(path)
+    
     if draw: 
         o3d.visualization.draw_geometries([pcd])
+    
     return pcd
 
 
 if __name__ == "__main__":
-    pcd = load_ptcloud("kinoptic_ptclouds/170407_haggling_a1/ptcloud_hd00001651.ply", draw=True)
+    sequence = "170407_haggling_a1"
+    pcd_idx = 1651
 
-    skels = load_skeleton_points_as_nparray('170407_haggling_a1', 1651)
+    pcd = load_ptcloud(sequence, pcd_idx, draw=True)
+
+    skels = load_skeleton_points_as_nparray(sequence, pcd_idx)
 
     # head = np.array([[-126.85966667, -163.11133333, -11.09929333]])
 
