@@ -1,18 +1,32 @@
 import numpy as np
 
-
 def plane(x, x0, normal):
-    # plane passing through the point x0
-    # and perpendicular to the vector normal
-
+    '''
+    Equation of a plane passing through the point x0 and perpendicular
+    to the normal vector.
+    Input:
+    - x: point -> type: np.array
+    - x0: point, joint -> type: np.array
+    - normal: normal vector, joints axis -> type: np.array
+    Ouput:
+    - Distance of the Plane
+    '''
     return np.dot(normal, x-x0)
 
 
 def cylinder(x, x1, x2, radius):
-    # cylinder defined as the set of all points 
-    # at distance from the line passing through the 
-    # two given points equal to the specified radius
-
+    '''
+    Equation of a cylinder defined as the set of all points at 
+    distance from the line passing through the two given points
+    equal to the specified radius.
+    Input:
+    - x: point -> type: np.array
+    - x1: point, joint -> type: np.array
+    - x2: point, joint -> type: np.array
+    - radius: Radius of the cylinder -> type: float
+    Ouput:
+    - Distance from the cylinder surface
+    '''
     num = np.linalg.norm(np.cross(x-x1, x-x2))
     den = np.linalg.norm(x2-x1)
 
@@ -20,21 +34,46 @@ def cylinder(x, x1, x2, radius):
 
 
 def is_in_truncated_cylinder(point, x1, x2, r):
+    '''
+    System of inequalities that determines if a point belongs to the truncated cylinder defined 
+    by the parameters.
+    Input:
+    - point: point -> type: np.array
+    - x1: point, joint -> type: np.array
+    - x2: point, joint -> type: np.array
+    - r: radius of the cylinder -> type: float
+    Ouput:
+    - Wether the point belongs to the cylinder or not -> type: bool
+    '''
     n = x1-x2
 
-    if (plane(point, x1, n) <= 0
+    return (plane(point, x1, n) <= 0
         and plane(point, x2, n) >=0
-        and cylinder(point, x1, x2, r) <= 0):
-        return True
+        and cylinder(point, x1, x2, r) <= 0) 
     
-    return False
 
-
-def sphere(x, c, radius):
+def sphere(x, c, radius): 
+    '''
+    Equation of the sphere with center x and radius radius.
+    Input:
+    - x: point -> type: np.array
+    - c: center of the sphere -> type: np.array
+    - radius: radius of the sphere -> type: float
+    Ouput:
+    - Distance from the sphere surface
+    '''
     return np.linalg.norm(x-c) - radius
 
 
 def filter(pcd, skels):
+    '''
+    Function that extracts people from the scene given their skeleton
+    Input:
+    - pcd: point cloud -> type: PointCloud
+    - skels: skeletons -> type: list
+    Output:
+    - Filtered Points -> type: PointCloud
+    '''
 
     # 0: Neck
     # 1: Nose

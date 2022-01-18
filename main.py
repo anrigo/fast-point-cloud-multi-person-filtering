@@ -4,7 +4,7 @@ import open3d as o3d
 import json
 import bbox_filtering as bf
 import time as tm
-import geometric_filtering as gf
+import cylinder_filtering as cf
 
 
 # Constants
@@ -14,14 +14,15 @@ data_path = 'dataset/'
 
 def load_skeleton_points_as_nparray(seq_name, hd_idx):
     '''
-    Function that load the skeleton points
+    Function that loads the skeleton joints
     Input:
-    - seq_name: It is the name of the sequence  -> type: string
-    - hd_idx : it is the index  -> type int 
+    - seq_name: It is the name of the sequence -> type: string
+    - hd_idx : it is the index of the frame  -> type int 
 
     Output
-    - Skeleton point: the point of the skeleton with also the hands -> type: list
+    - Skeleton points: the joints of the skeleton and the hands -> type: list
     '''
+
     skel_points = []
     hands = []
     #Path of the folder that contains the json file with the points of the pose
@@ -42,7 +43,6 @@ def load_skeleton_points_as_nparray(seq_name, hd_idx):
         with open(hand_json_fname) as dfile:
             hframe = json.load(dfile)
 
-
         # Cycle Bodies
         for ids in range(len(bframe['bodies'])):
             body = bframe['bodies'][ids]
@@ -51,10 +51,8 @@ def load_skeleton_points_as_nparray(seq_name, hd_idx):
             # keep 3d coordinates, remove confidence score
             body_points = np.delete(np.array(body['joints19']).reshape((-1,4)), [-1], axis=1)
 
-            
             skel_points.insert(ids, body_points)
         
-
         # Cycle Hands
         for hand in hframe['people']:
             hand3d_r = np.array(hand['right_hand']['landmarks']).reshape((-1,3))
@@ -68,19 +66,18 @@ def load_skeleton_points_as_nparray(seq_name, hd_idx):
     
     skels = [[skel_points[i], hands[i][0], hands[i][1]] for i in range(len(skel_points))]
 
-
     return skels
 
 
 def load_ptcloud(sequence, hd_idx, draw=False):
     '''
-    Function that load a point cloud
+    Function that loads a point cloud
     Input:
-    - sequence: It is the name of the sequence  -> type: string 
-    - hd_idx: it is the index  -> type int 
-    - draw : indicates if you want to draw -> type: bool
+    - sequence: it is the name of the sequence  -> type: string 
+    - hd_idx: it is the index of the frame  -> type int 
+    - draw : indicates if you want to display the point cloud or not -> type: bool
     Output:
-    - pcd: it return the point cloud and if the variable draw is true, it also draw the point cloud 
+    - pcd: it returns the point cloud and if the variable draw is true, it also draws the point cloud 
     '''
 
     path = f"kinoptic_ptclouds/{sequence}" + "/ptcloud_hd{0:08d}.ply".format(hd_idx)
@@ -98,35 +95,22 @@ if __name__ == "__main__":
     sequence = "170407_haggling_a1"
     pcd_idx = 1700
 
-    #it calls the function called load_ptcloud
+    #Load pcd
     pcd = load_ptcloud(sequence, pcd_idx, draw=True)
 
-    #It calls the function called load_skeleton_points_as_nparray 
+    #Load skeleton
     skels = load_skeleton_points_as_nparray(sequence, pcd_idx)
 
-    # head = np.array([[-126.85966667, -163.11133333, -11.09929333]])
-
-    #it converts the point from numpy to open3D
-    skel_points = o3d.utility.Vector3dVector(skels[0][0])
-    # head_points = o3d.utility.Vector3dVector(head)
-
-    #It creates point cloud with the point contained into skel_points
-    skel_cloud = o3d.geometry.PointCloud(skel_points)
-
-    # head_cloud = o3d.geometry.PointCloud(head_points)
-    # l_hand_points = o3d.utility.Vector3dVector(skels[0][1])
-    # r_hand_points = o3d.utility.Vector3dVector(skels[0][2])
-    # r_hand_cloud = o3d.geometry.PointCloud(r_hand_points)
-    # l_hand_cloud = o3d.geometry.PointCloud(l_hand_points)
-    # o3d.visualization.draw_geometries([pcd, skel_cloud, head_cloud, l_hand_cloud, r_hand_cloud])
-
     t0 = tm.time()
-    #It calls the function that is in bbox_filtering.py
+    #Filter using the fast algorithm 
     filtered = bf.filter(pcd, skels)
-    #filtered = gf.filter(pcd,skels)
+    #Filter with the slow algorithm
+    #filtered = cf.filter(pcd,skels)
     t1 = tm.time()
 
     print(t1-t0)
 
     #Visualize the output of the algorithm
-    o3d.visualization.draw_geometries([filtered, skel_cloud])
+    o3d.visualization.draw_geometries([filtered])
+
+   

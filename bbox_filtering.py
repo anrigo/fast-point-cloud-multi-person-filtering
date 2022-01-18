@@ -5,10 +5,15 @@ import open3d as o3d
 
 # EULER-RODRIGUES FORMULA
 def rotation_matrix(axis, theta):
-    """
-    Return the rotation matrix associated with counterclockwise rotation about
-    the given axis by theta radians.
-    """
+    '''
+    Function that uses the Euler-Rodrigues formula to compute the rotation matrix corresponding to 
+    the axis and angle rotation theta.
+    Input:
+    - axis of rotation -> type: np.array
+    - theta: rotation in radiants -> type: float
+    Ouput:
+    - Rotation Matrix
+    '''
     axis = np.asarray(axis)
     axis = axis / np.sqrt(np.dot(axis, axis))
     a = np.cos(theta / 2.0)
@@ -21,22 +26,38 @@ def rotation_matrix(axis, theta):
 
 
 def get_indices_of_points_in_prism_bbox(x1, x2, ratio, points):
-    
+    '''
+    Funtion that extracts the points inside a bounding box
+    Input:
+    - x1: skeleton joint -> type: np.array
+    - x2: skeleton joint -> type: np.array
+    - ratio: Ratio of x and y dimensions w.r.t the z dimension -> type: float
+    - points: Point cloud Points -> type: Vector3dVector
+    Output:
+    - idx : Indices of points inside the bounding box -> type: int
+    '''
+
+    # z axis
     ref = np.array([0,0,1])
 
+    # joints axis
     v = x2-x1
+    # length of axis
     l = np.linalg.norm(v)
+    # center of the box: median point 
     c = (x1+x2)/2
 
-
+    # Compute axis with cross 
     axis = np.cross(v, ref)
 
+    # If the axis norm is not 0, then, there is a rotation
     if np.linalg.norm(axis) != 0:
+        # Compute the roation angle with dot product 
         theta = np.arccos(np.dot(v,ref)/l)
         R = rotation_matrix(axis, -theta)
     else:
+        # Use the identity matrix if there is no rotation
         R = np.eye(3)
-
 
     box = o3d.geometry.OrientedBoundingBox(
             center=c,
@@ -50,6 +71,15 @@ def get_indices_of_points_in_prism_bbox(x1, x2, ratio, points):
 
 
 def get_indices_of_points_in_cubic_bbox(x, extent, points):
+    '''
+    Funtion that extracts the points inside a bounding box
+    Input:
+    - x: center of the bounding box -> type: np.array
+    - extent: Edge length of the cubic bounding box-> type: float
+    - points: Point cloud Points -> type: Vector3dVector
+    Output:
+    - idx : Indices of points inside the bounding box -> type: int
+    '''
     box = o3d.geometry.OrientedBoundingBox(
             center=x,
             R=np.eye(3),
@@ -62,6 +92,14 @@ def get_indices_of_points_in_cubic_bbox(x, extent, points):
 
 
 def filter(pcd, skels):
+    '''
+    Function that extracts people from the scene given their skeleton
+    Input:
+    - pcd: point cloud -> type: PointCloud
+    - skels: skeletons -> type: list
+    Output:
+    - Filtered Points -> type: PointCloud
+    '''
 
     # 0: Neck
     # 1: Nose
@@ -137,7 +175,7 @@ def filter(pcd, skels):
         # BACKSIDE
         0.4, # l-hip-r-hip
     ]
-
+    # Cubic bounding boxes' extents
     sizes = [
         27, # head
         18, # l-hand
@@ -158,7 +196,7 @@ def filter(pcd, skels):
     for skel in skels:
 
         body = skel[0]
-
+        #Compute the mean of head, left and right hand in order to center the sphere. 
         centers = [
             np.mean(body[[1,16,18]], axis=0), # head
             np.mean(skel[1], axis=0), # l-hand
@@ -180,5 +218,6 @@ def filter(pcd, skels):
             indices.extend(
                 get_indices_of_points_in_cubic_bbox(body[joint], sizes[i+3], pcd.points)
             )
-
+            
     return pcd.select_by_index(indices)
+    
