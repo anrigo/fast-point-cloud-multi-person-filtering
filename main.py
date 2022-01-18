@@ -4,6 +4,7 @@ import open3d as o3d
 import json
 import bbox_filtering as bf
 import time as tm
+import geometric_filtering as gf
 
 
 # Constants
@@ -122,6 +123,7 @@ if __name__ == "__main__":
     t0 = tm.time()
     #It calls the function that is in bbox_filtering.py
     filtered = bf.filter(pcd, skels)
+    #filtered = gf.filter(pcd,skels)
     t1 = tm.time()
 
     print(t1-t0)

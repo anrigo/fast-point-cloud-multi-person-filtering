@@ -56,67 +56,67 @@ def filter(pcd, skels):
     # 17: rEye
     # 18: rEar
 
-    skel = skels[0]
-    body = skel[0]
+    #skel = skels[0]
     indices = []
+   
+    for skel in skels:
+        body = skel[0]
+        head_center = np.mean(body[[1,16,18]], axis=0)
+        l_hand_center = np.mean(skel[1], axis=0)
+        r_hand_center = np.mean(skel[2], axis=0)
 
-    head_center = np.mean(body[[1,16,18]], axis=0)
-    l_hand_center = np.mean(skel[1], axis=0)
-    r_hand_center = np.mean(skel[2], axis=0)
+        for i, point in enumerate(pcd.points):
+            if (
+                # ARMS
 
+                # lShoulder, lElbow: 3,4
+                is_in_truncated_cylinder(point, body[3], body[4], 5)
 
-    for i, point in enumerate(pcd.points):
-        if (
-            # ARMS
+                # lElbow, lWrist: 4,5
+                or is_in_truncated_cylinder(point, body[4], body[5], 5)
 
-            # lShoulder, lElbow: 3,4
-            is_in_truncated_cylinder(point, body[3], body[4], 5)
+                # rShoulder, rElbow: 9,10
+                or is_in_truncated_cylinder(point, body[9], body[10], 10)
 
-            # lElbow, lWrist: 4,5
-            or is_in_truncated_cylinder(point, body[4], body[5], 5)
+                # rElbow, rWrist: 10,11
+                or is_in_truncated_cylinder(point, body[10], body[11], 5)
 
-            # rShoulder, rElbow: 9,10
-            or is_in_truncated_cylinder(point, body[9], body[10], 10)
+                # LEGS
 
-            # rElbow, rWrist: 10,11
-            or is_in_truncated_cylinder(point, body[10], body[11], 5)
+                # lHip, lKnee: 6,7
+                or is_in_truncated_cylinder(point, body[6], body[7], 10)
 
-            # LEGS
+                # lKnee, lAnkle: 7,8
+                or is_in_truncated_cylinder(point, body[7], body[8], 10)
 
-            # lHip, lKnee: 6,7
-            or is_in_truncated_cylinder(point, body[6], body[7], 10)
+                # rHip, rKnee: 12,13
+                or is_in_truncated_cylinder(point, body[12], body[13], 10)
 
-            # lKnee, lAnkle: 7,8
-            or is_in_truncated_cylinder(point, body[7], body[8], 10)
+                # rKnee, rAnkle: 13,14
+                or is_in_truncated_cylinder(point, body[13], body[14], 10)
 
-            # rHip, rKnee: 12,13
-            or is_in_truncated_cylinder(point, body[12], body[13], 10)
+                # neck, bodyCenter: 0,2
+                or is_in_truncated_cylinder(point, body[0], body[2], 18)
 
-            # rKnee, rAnkle: 13,14
-            or is_in_truncated_cylinder(point, body[13], body[14], 10)
+                # HEAD
+                or sphere(point, head_center, 18) <= 0
 
-            # neck, bodyCenter: 0,2
-            or is_in_truncated_cylinder(point, body[0], body[2], 18)
+                # SHOULDERS
 
-            # HEAD
-            or sphere(point, head_center, 18) <= 0
+                # lShoulder, Neck: 3,0
+                or is_in_truncated_cylinder(point, body[3], body[0], 15)
 
-            # SHOULDERS
+                # rShoulder, Neck: 9,0
+                or is_in_truncated_cylinder(point, body[9], body[0], 15)
 
-            # lShoulder, Neck: 3,0
-            or is_in_truncated_cylinder(point, body[3], body[0], 15)
+                # HANDS
 
-            # rShoulder, Neck: 9,0
-            or is_in_truncated_cylinder(point, body[9], body[0], 15)
+                # rHand
+                or sphere(point, r_hand_center, 15) <= 0
 
-            # HANDS
-
-            # rHand
-            or sphere(point, r_hand_center, 15) <= 0
-
-            # lHand
-            or sphere(point, l_hand_center, 15) <= 0
-        ):
-            indices.append(i)
+                # lHand
+                or sphere(point, l_hand_center, 15) <= 0
+            ):
+                indices.append(i)
 
     return pcd.select_by_index(indices)
