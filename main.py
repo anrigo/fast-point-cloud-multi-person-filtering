@@ -5,6 +5,7 @@ import json
 import bbox_filtering as bf
 import time as tm
 import cylinder_filtering as cf
+from open3d.visualization import Visualizer 
 
 
 # Constants
@@ -93,6 +94,8 @@ def load_ptcloud(sequence, hd_idx, draw=False):
 if __name__ == "__main__":
     #Global variables
     sequence = "170407_haggling_a1"
+    #Run the algorithm for single frame
+    '''
     pcd_idx = 1700
 
     #Load pcd
@@ -112,5 +115,44 @@ if __name__ == "__main__":
 
     #Visualize the output of the algorithm
     o3d.visualization.draw_geometries([filtered])
+
+    '''
+    #Run the algorithm for the multiple frames
+    range_indices = range(1651, 1700, 4)
+    
+    vis = Visualizer()
+    vis.create_window()
+
+    for pcd_idx in range_indices: 
+        try:
+            #Load pcd
+            pcd = load_ptcloud(sequence, pcd_idx, draw=False)
+
+            #Load skeleton
+            skels = load_skeleton_points_as_nparray(sequence, pcd_idx)
+
+            t0 = tm.time()
+            #Filter using the fast algorithm 
+            filtered = bf.filter(pcd, skels)
+            #Filter with the slow algorithm
+            #filtered = cf.filter(pcd,skels)
+            #Display the unfiltered point cloud
+            #filtered = pcd
+            t1 = tm.time()
+
+            print(t1-t0)
+
+            #Visualize the output of the algorithm
+            vis.add_geometry(filtered)
+            vis.update_renderer()
+            vis.poll_events()
+            
+            tm.sleep(2)
+            vis.remove_geometry(filtered)
+            
+        except KeyError:
+            print("The skeleton is probably missing a body part")
+
+    vis.close() 
 
    
